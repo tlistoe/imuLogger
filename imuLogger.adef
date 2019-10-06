@@ -1,0 +1,22 @@
+sandboxed: false
+start: manual
+version: 2.0
+maxFileSystemBytes: 4096K
+
+executables:
+{
+	imuLogger = ( imuLoggerComp )
+}
+processes:
+{
+	run:
+	{
+		(imuLogger)
+	}
+	
+}
+
+bindings:
+{    
+
+}

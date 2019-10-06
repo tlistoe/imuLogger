@@ -24,7 +24,7 @@
 
 //--------------------------------------------------------------------------------------------------
 /*
- * gnssTmer runs every 10 seconds when called as gnssTmerRef handler
+ * imuTmer runs every 10 seconds when called as imuTmerRef handler
  */
 //--------------------------------------------------------------------------------------------------
 
@@ -74,11 +74,8 @@ static void imuLogTimer(le_timer_Ref_t imuLogTimerRef)
     uint64_t tnow = GetCurrentTimestamp();
     le_result_t accRes = mangOH_ReadAccelerometer(&xAcc, &yAcc, &zAcc);
     le_result_t gyroRes = mangOH_ReadGyro(&x, &y, &z);
-	//sprintf(filenamebuff,"sdcard/gnssLog.txt", timestamp);
-	//sprintf(buffer, "sdcard/imuLog_%s.txt", sec );
-	//FILE* fd = fopen (buffer, "a");
+	
 	FILE* fd = fopen ("sdcard/imuLog.txt", "a");
-	//GetCurrentTimestamp(timestamp);
 	
 	if (fd == NULL)
 	{
@@ -90,7 +87,7 @@ static void imuLogTimer(le_timer_Ref_t imuLogTimerRef)
 		{
 			// Write something in fd
 		
-		fprintf(fd, "%lld,%f,%f,%f,%f,%f,%f\n", tnow, xAcc, yAcc, zAcc, x, y, z);
+		fprintf(fd, "%lld\t%f\t%f\t%f\t%f\t%f\t%f\n", tnow, xAcc, yAcc, zAcc, x, y, z);
 		}else{
 			fprintf(fd, "%s %s", timestamp, " imuLog no data\n");
 		}
@@ -119,6 +116,46 @@ static void imuLogTimer(le_timer_Ref_t imuLogTimerRef)
 COMPONENT_INIT
 {
 	LE_INFO("imuLogTemp application has started");
+	
+		char timestamp[80] = {0};
+	char systemCommand[300] = {0};
+	time_t     now;
+    struct tm  ts;
+    int systemResult;
+    
+    // Get current time
+    time(&now);
+
+    // Format time, "yyyy-mm-dd hh:mm:ss"
+    ts = *localtime(&now);
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d-%H-%M-%S", &ts);
+    // move old log file to a date stamped file name
+    sprintf(systemCommand, "mv /mnt/userrw/sdcard/imuLog.txt /mnt/userrw/sdcard/%s_imuLog.txt", timestamp);
+
+    systemResult = system(systemCommand);
+    // Return value of -1 means that the fork() has failed (see man system).
+    if (0 == WEXITSTATUS(systemResult))
+    {
+        LE_INFO("Succesfully backed up imu log file: sys> %s", systemCommand);
+    }
+    else
+    {
+        LE_ERROR("Error imu log file backup Failed: (%d), sys> %s", systemResult, systemCommand);
+    }
+	
+	//write file header line for first row
+	FILE* fd = fopen ("sdcard/imuLog.txt", "a");
+	fprintf(fd, "Time\txAcc\tyAcc\tzAcc\txGyr\tyGyr\tzGyr\n");
+		// Now write this string to fd
+	if (fclose(fd) == 0)
+	{
+			// Print success message
+		LE_INFO("Data successfuly written");
+	}
+	else
+	{
+		LE_INFO("Error closing file");
+	}
 	
 	le_timer_Ref_t imuLogTimerRef = le_timer_Create("imuLog Timer");
     le_timer_SetMsInterval(imuLogTimerRef, IMU_SAMPLE_INTERVAL_IN_MILLISECONDS);

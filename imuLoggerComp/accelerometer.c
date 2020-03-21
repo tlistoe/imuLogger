@@ -4,7 +4,7 @@
 #include "accelerometer.h"
 #include "sensorUtils.h"
 
-static const char FormatStr[] = "/sys/devices/i2c-0/0-0068/iio:device0/in_%s_%s";
+static const char FormatStr[] = "/sys/bus/i2c/devices/6-0068/iio:device0/in_%s_%s";
 static const char AccType[]   = "accel";
 static const char GyroType[]  = "anglvel";
 static const char CompX[]     = "x_raw";

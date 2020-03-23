@@ -20,6 +20,7 @@
 
 #define IMU_SAMPLE_INTERVAL_IN_MILLISECONDS (10)
 
+int count = 0;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -49,11 +50,13 @@ static void imuLogTimer(le_timer_Ref_t imuLogTimerRef)
 {
     //char timestamp[80] = {};
 	char timestamp[80] = {0};
+	char *display = (char*)malloc(22*sizeof(char));
 	//char buffer[100] = {0};
 	// Atomic write example, File Descriptor case.
 	//char filenamebuff[255] = {0};
 	time_t     now;
     struct tm  ts;
+    
     
     // Get current time
     time(&now);
@@ -74,6 +77,15 @@ static void imuLogTimer(le_timer_Ref_t imuLogTimerRef)
     uint64_t tnow = GetCurrentTimestamp();
     le_result_t accRes = mangOH_ReadAccelerometer(&xAcc, &yAcc, &zAcc);
     le_result_t gyroRes = mangOH_ReadGyro(&x, &y, &z);
+    
+    //display every hundredth sample to the OLED screen (approx 1/sec)
+    count++;
+    if (count == 101){
+		count = 0;
+		sprintf(display, "%.2f, %.2f, %.2f", xAcc, yAcc, zAcc);
+		piOled_Display("Ax     Ay     Az", 2);
+		piOled_Display(display, 3);
+	}
 	
 	FILE* fd = fopen ("sdcard/imuLog.txt", "a");
 	

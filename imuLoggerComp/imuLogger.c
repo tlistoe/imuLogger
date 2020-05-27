@@ -142,7 +142,7 @@ COMPONENT_INIT
     //ts = *localtime(&now);
     //strftime(timestamp, sizeof(timestamp), "%Y-%m-%d-%H-%M-%S", &ts);
     // move old log file to a date stamped file name
-    sprintf(systemCommand, "lastStartTime=$(cat /mnt/userrw/sdcard/lastStartTime.txt); mkdir /mnt/userrw/sdcard/\"$lastStartTime\"; mv /mnt/userrw/sdcard/imuLog.txt /mnt/userrw/sdcard/\"$lastStartTime\"/\"$lastStartTime\"_imuLog.txt");
+    /*sprintf(systemCommand, "lastStartTime=$(cat /mnt/userrw/sdcard/lastStartTime.txt); mkdir /mnt/userrw/sdcard/\"$lastStartTime\"; mv /mnt/userrw/sdcard/imuLog.txt /mnt/userrw/sdcard/\"$lastStartTime\"/\"$lastStartTime\"_imuLog.txt");
 
 
     systemResult = system(systemCommand);
@@ -155,6 +155,7 @@ COMPONENT_INIT
     {
         LE_ERROR("Error imu log file backup Failed: (%d), sys> %s", systemResult, systemCommand);
     }
+	*/
 	
 	//write file header line for first row
 	FILE* fd = fopen ("sdcard/imuLog.txt", "a");
